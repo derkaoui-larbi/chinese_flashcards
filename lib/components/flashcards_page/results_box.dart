@@ -70,7 +70,7 @@ class _ResultsBoxState extends State<ResultsBox> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const FlashcardsPage(),
+                                        const FlashcardsPage(topic: '',),
                                   ),
                                 );
                               },

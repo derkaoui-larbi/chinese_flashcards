@@ -7,13 +7,14 @@ import 'package:flutter_flashcards/notifiers/review_notifier.dart';
 import 'package:flutter_flashcards/pages/flashcards_page.dart';
 import 'package:flutter_flashcards/pages/review_page.dart';
 import 'package:flutter_flashcards/pages/settings_page.dart';
+import 'package:flutter_flashcards/pages/add_topic_page.dart';
 import 'package:provider/provider.dart';
 
 import '../components/home_page/topic_tile.dart';
-import '../data/words.dart';
 
 class HomePage extends StatefulWidget {
   static const String id = '/HomePage';
+
   const HomePage({Key? key}) : super(key: key);
 
   @override
@@ -21,24 +22,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<String> _topics = [];
-
-  @override
-  void initState() {
-    super.initState();
-    for (var t in words) {
-      if (!_topics.contains(t.topic)) {
-        _topics.add(t.topic);
-      }
-      _topics.sort();
-    }
-    _topics.insertAll(0, []);
-  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final widthPadding = size.width * 0.04;
+
     return Scaffold(
       appBar: AppBar(
         shape: const RoundedRectangleBorder(
@@ -51,7 +40,6 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Settings icon
             _buildIcon(
                 imagePath: 'assets/images/Settings.png',
                 onTap: () => _navigateToSettingsPage(context),
@@ -63,7 +51,6 @@ class _HomePageState extends State<HomePage> {
                   textAlign: TextAlign.center,
                 )
             ),
-            // Review icon
             _buildIcon(
                 imagePath: 'assets/images/Review.png',
                 onTap: () => _loadReviewPage(context),
@@ -72,40 +59,46 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: widthPadding),
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              expandedHeight: size.height * 0.40,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                    padding: EdgeInsets.all(size.width * 0.10),
-                    child: FadeInAnimation(
-                        child: Image.asset('assets/images/MyFlashcards.png')
-                    )
-                ),
-              ),
+      body: Consumer<FlashcardsNotifier>(
+        builder: (context, notifier, _) {
+          var topics = notifier.getAllTopics(); // Retrieves all topics, both hardcoded and dynamically added
+
+          return GridView.builder(
+            padding: EdgeInsets.symmetric(horizontal: widthPadding),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 6,
             ),
-            SliverGrid(
-                delegate: SliverChildBuilderDelegate(
-                        (context, index) => TopicTile(topic: _topics[index]),
-                    childCount: _topics.length
-                ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 6,
-                  mainAxisSpacing: 6,
-                )
-            )
-          ],
-        ),
+            itemCount: topics.length + 1, // Plus one for the add button
+            itemBuilder: (context, index) {
+              if (index < topics.length) {
+                return TopicTile(topic: topics[index]);
+              } else {
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AddTopicPage()),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey[100],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.add, size: 64, color: Colors.black54),
+                    ),
+                  ),
+                );
+              }
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const FlashcardsPage())
+          context,
+          MaterialPageRoute(builder: (context) => const FlashcardsPage(topic: '',)),
         ),
         child: const Icon(Icons.add),
       ),
@@ -113,7 +106,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _loadReviewPage(BuildContext context) {
-    Provider.of<FlashcardsNotifier>(context, listen: false).setTopic(topic: 'Review');
+    Provider.of<FlashcardsNotifier>(context, listen: false).setTopic('Review');
     DatabaseManager().selectWords().then((words) {
       final reviewNotifier = Provider.of<ReviewNotifier>(context, listen: false);
       reviewNotifier.disableButtons(disable: words.isEmpty);
@@ -122,7 +115,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _navigateToSettingsPage(BuildContext context) {
-    Provider.of<FlashcardsNotifier>(context, listen: false).setTopic(topic: 'Settings');
+    Provider.of<FlashcardsNotifier>(context, listen: false).setTopic('Settings');
     Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
   }
 

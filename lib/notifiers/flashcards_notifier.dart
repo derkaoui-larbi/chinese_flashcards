@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_flashcards/components/flashcards_page/results_box.dart';
 import 'package:flutter_flashcards/configs/constants.dart';
@@ -14,76 +13,127 @@ class FlashcardsNotifier extends ChangeNotifier {
       incorrectTally = 0,
       correctPercentage = 0;
 
-  calculateCorrectPercentage() {
-    final percentage = correctTally / cardTally;
-    correctPercentage = (percentage * 100).round();
-  }
-
   double percentComplete = 0.0;
+  Map<String, List<Word>> topicsFlashcards = {}; // Map to store topics and their flashcards
+  Map<String, String> topicImages = {};
+  String currentTopic = "";
+  Word word1 = Word(topic: "", chapter: "Loading", question: "", pinyin: "");
+  Word word2 = Word(topic: "", chapter: "Loading", question: "", pinyin: "");
+  List<Word> selectedWords = [];
+  List<Word> incorrectCards = [];
 
-  calculateCompletedPercent() {
-    percentComplete = (correctTally + incorrectTally) / cardTally;
+  bool isFirstRound = true,
+      isRoundCompleted = false,
+      isSessionCompleted = false,
+      ignoreTouches = true;
+
+  SlideDirection swipedDirection = SlideDirection.none;
+  bool slideCard1 = false,
+      flipCard1 = false,
+      flipCard2 = false,
+      swipeCard2 = false;
+  bool resetSlideCard1 = false,
+      resetFlipCard1 = false,
+      resetFlipCard2 = false,
+      resetSwipeCard2 = false;
+
+  // Existing methods...
+
+  void calculateCorrectPercentage() {
+    if (cardTally != 0) {
+      final percentage = correctTally / cardTally;
+      correctPercentage = (percentage * 100).round();
+    }
     notifyListeners();
   }
 
-  resetProgressBar() {
+  void calculateCompletedPercent() {
+    if (cardTally != 0) {
+      percentComplete = (correctTally + incorrectTally) / cardTally;
+    }
+    notifyListeners();
+  }
+
+  void resetProgressBar() {
     percentComplete = 0.0;
     notifyListeners();
   }
 
-  List<Word> incorrectCards = [];
-
-  String topic = "";
-  Word word1 =
-      Word(topic: "", chapter: "Loading Arrow", question: "", pinyin: "");
-  Word word2 =
-      Word(topic: "", chapter: "Loading Arrow", question: "", pinyin: "");
-  List<Word> selectedWords = [];
-
-  bool isFirstRound = true,
-      isRoundCompleted = false,
-      isSessionCompleted = false;
-
-  reset() {
-    resetCard1();
-    resetCard2();
+  void reset() {
     incorrectCards.clear();
     isFirstRound = true;
     isRoundCompleted = false;
     isSessionCompleted = false;
     roundTally = 0;
-  }
-
-  setTopic({required String topic}) {
-    this.topic = topic;
+    percentComplete = 0.0;
+    correctTally = 0;
+    incorrectTally = 0;
     notifyListeners();
   }
 
-  generateAllSelectedWords() {
-    words.shuffle();
-    isRoundCompleted = false;
-    if (isFirstRound) {
-      if (topic == 'Random 5') {
-        selectedWords.clear();
-        for (int i = 0; i < 5; i++) {
-          selectedWords.add(words[i]);
-        }
-      } else if (topic == 'Random 20') {
-        selectedWords.clear();
-        for (int i = 0; i < 20; i++) {
-          selectedWords.add(words[i]);
-        }
-      } else if (topic == 'Test All') {
-        selectedWords.clear();
-        selectedWords = words.toList();
-      } else if (topic != 'Review') {
-        selectedWords.clear();
-        selectedWords =
-            words.where((element) => element.topic == topic).toList();
-      }
+  void setTopic(String newTopic) {
+    currentTopic = newTopic;
+    selectedWords = topicsFlashcards[newTopic] ?? [];
+    notifyListeners();
+  }
+
+  void addTopicWithFlashcards(String topicName, List<Map<String, String>> flashcardsData, String imageUrl) {
+    List<Word> flashcards = flashcardsData.map((data) => Word(
+      topic: topicName,
+      chapter: '',
+      question: data['front'] ?? '',
+      pinyin: data['back'] ?? '',
+    )).toList();
+
+    topicsFlashcards[topicName] = flashcards;
+    topicImages[topicName] = imageUrl.isNotEmpty ? imageUrl : getRandomImageUrl();
+    notifyListeners();
+  }
+
+  String getRandomImageUrl() {
+    List<String> defaultImages = ['default1.png', 'default2.png', 'default3.png'];
+    return 'assets/images/' + (defaultImages..shuffle()).first;
+  }
+
+  void addFlashcard(String topicName, String frontText, String backText) {
+    final newFlashcard = Word(
+      topic: topicName,
+      chapter: '',
+      question: frontText,
+      pinyin: backText,
+    );
+
+    if (topicsFlashcards.containsKey(topicName)) {
+      topicsFlashcards[topicName]?.add(newFlashcard);
     } else {
-      selectedWords = incorrectCards.toList();
-      incorrectCards.clear();
+      topicsFlashcards[topicName] = [newFlashcard];
+    }
+    notifyListeners();
+  }
+
+  void refreshFlashcards() {
+    notifyListeners();
+  }
+
+  List<String> getAllTopics() {
+    List<String> allTopics = ['CSC2303', 'CSC3324', 'CSC1401']; // Hardcoded topics
+    allTopics.addAll(topicsFlashcards.keys); // Add dynamically added topics
+    return allTopics;
+  }
+
+  void generateAllSelectedWords() {
+    words.shuffle();
+    selectedWords.clear();
+    isRoundCompleted = false;
+    isFirstRound = true;
+    if (currentTopic == 'Random 5') {
+      selectedWords.addAll(words.take(5));
+    } else if (currentTopic == 'Random 20') {
+      selectedWords.addAll(words.take(20));
+    } else if (currentTopic == 'Test All') {
+      selectedWords.addAll(words);
+    } else if (currentTopic != 'Review') {
+      selectedWords.addAll(words.where((element) => element.topic == currentTopic));
     }
     roundTally++;
     cardTally = selectedWords.length;
@@ -92,7 +142,7 @@ class FlashcardsNotifier extends ChangeNotifier {
     resetProgressBar();
   }
 
-  generateCurrentWord({required BuildContext context}) {
+  void generateCurrentWord(BuildContext context) {
     if (selectedWords.isNotEmpty) {
       final r = Random().nextInt(selectedWords.length);
       word1 = selectedWords[r];
@@ -114,7 +164,7 @@ class FlashcardsNotifier extends ChangeNotifier {
     });
   }
 
-  updateCardOutcome({required Word word, required bool isCorrect}) {
+  void updateCardOutcome(Word word, bool isCorrect) {
     if (!isCorrect) {
       incorrectCards.add(word);
       incorrectTally++;
@@ -122,65 +172,48 @@ class FlashcardsNotifier extends ChangeNotifier {
       correctTally++;
     }
     calculateCompletedPercent();
-    notifyListeners();
   }
 
-  /// Animation Code
-
-  bool ignoreTouches = true;
-
-  setIgnoreTouch({required bool ignore}) {
+  // Animation Code
+  void setIgnoreTouch(bool ignore) {
     ignoreTouches = ignore;
     notifyListeners();
   }
 
-  SlideDirection swipedDirection = SlideDirection.none;
-
-  bool slideCard1 = false,
-      flipCard1 = false,
-      flipCard2 = false,
-      swipeCard2 = false;
-
-  bool resetSlideCard1 = false,
-      resetFlipCard1 = false,
-      resetFlipCard2 = false,
-      resetSwipeCard2 = false;
-
-  runSlideCard1() {
+  void runSlideCard1() {
     resetSlideCard1 = false;
     slideCard1 = true;
     notifyListeners();
   }
 
-  runFlipCard1() {
+  void runFlipCard1() {
     resetFlipCard1 = false;
     flipCard1 = true;
     notifyListeners();
   }
 
-  resetCard1() {
+  void resetCard1() {
     resetSlideCard1 = true;
     resetFlipCard1 = true;
     slideCard1 = false;
     flipCard1 = false;
   }
 
-  runFlipCard2() {
+  void runFlipCard2() {
     resetFlipCard2 = false;
     flipCard2 = true;
     notifyListeners();
   }
 
-  runSwipeCard2({required SlideDirection direction}) {
-    updateCardOutcome(
-        word: word2, isCorrect: direction == SlideDirection.leftAway);
+  void runSwipeCard2(SlideDirection direction) {
+    updateCardOutcome(word2, direction == SlideDirection.leftAway);
     swipedDirection = direction;
     resetSwipeCard2 = false;
     swipeCard2 = true;
     notifyListeners();
   }
 
-  resetCard2() {
+  void resetCard2() {
     resetFlipCard2 = true;
     resetSwipeCard2 = true;
     flipCard2 = false;

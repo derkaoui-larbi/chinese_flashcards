@@ -30,7 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return Scaffold(
           appBar: const PreferredSize(
               preferredSize: Size.fromHeight(kAppBarHeight),
-              child: CustomAppBar()),
+              child: CustomAppBar(topic: '')),
           body: Stack(
             children: [
               Column(

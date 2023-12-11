@@ -10,9 +10,7 @@ import '../../utils/methods.dart';
 import 'card_display.dart';
 
 class Card1 extends StatelessWidget {
-  const Card1({
-    Key? key,
-  }) : super(key: key);
+  const Card1({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +19,7 @@ class Card1 extends StatelessWidget {
       builder: (_, notifier, __) => GestureDetector(
         onDoubleTap: () {
           notifier.runFlipCard1();
-          notifier.setIgnoreTouch(ignore: true);
+          notifier.setIgnoreTouch(true);
           SharedPreferences.getInstance().then((prefs) {
             if (prefs.getBool('guidebox') == null) {
               runGuideBox(context: context, isFirst: false);
@@ -32,16 +30,11 @@ class Card1 extends StatelessWidget {
           animate: notifier.flipCard1,
           reset: notifier.resetFlipCard1,
           flipFromHalfWay: false,
-          animationCompleted: () {
-            notifier.resetCard1();
-            var runFlipCard2 = notifier.runFlipCard2();
-          },
+          animationCompleted: () => notifier.resetCard1(),
           child: SlideAnimation(
             animationDuration: 1000,
             animationDelay: 200,
-            animationCompleted: () {
-              notifier.setIgnoreTouch(ignore: false);
-            },
+            animationCompleted: () => notifier.setIgnoreTouch(false),
             reset: notifier.resetSlideCard1,
             animate: notifier.slideCard1 && !notifier.isRoundCompleted,
             direction: SlideDirection.upIn,
@@ -57,7 +50,7 @@ class Card1 extends StatelessWidget {
                   ),
                   color: Theme.of(context).primaryColor,
                 ),
-                child: const CardDisplay(isCard1: true),
+                child: notifier.selectedWords.isNotEmpty ? CardDisplay(word: notifier.selectedWords[0]) : const SizedBox(),
               ),
             ),
           ),

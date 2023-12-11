@@ -11,18 +11,18 @@ import '../enums/settings.dart';
 
 loadSession({required BuildContext context, required String topic}) {
   Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const FlashcardsPage()));
+      MaterialPageRoute(builder: (context) => const FlashcardsPage(topic: '',)));
   Provider.of<FlashcardsNotifier>(context, listen: false)
-      .setTopic(topic: topic);
+      .setTopic(topic);
 }
 
 extension SettingsToText on Settings {
   String toText() {
     switch (this) {
       case Settings.englishFirst:
-        return 'Show English First';
+        return 'Show topic first';
       case Settings.showPinyin:
-        return 'Show Pinyin';
+        return 'Show answer';
       case Settings.audioOnly:
         return 'Test Listening';
     }
@@ -35,11 +35,11 @@ extension LanguageSymbol on LanguageType {
       case LanguageType.image:
         return '🖼️';
       case LanguageType.english:
-        return 'Abc';
+        return 'Topic';
       case LanguageType.character:
-        return '汉字';
+        return 'Question';
       case LanguageType.pinyin:
-        return 'Pīn';
+        return 'Answer';
     }
   }
 }

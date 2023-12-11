@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flashcards/components/app/tts_button.dart';
-import 'package:flutter_flashcards/notifiers/flashcards_notifier.dart';
-//import 'package:flutter_flashcards/pages/create_flashcard_form.dart';
-import '../../models/word.dart';
-import 'create_flashcard_form.dart';
 import 'package:flutter_flashcards/notifiers/settings_notifier.dart';
 import 'package:provider/provider.dart';
-
+import '../../models/word.dart';
 import '../../enums/settings.dart';
 
 class CardDisplay extends StatelessWidget {
+  final Word word;
+
   const CardDisplay({
-    required this.isCard1,
+    required this.word,
     Key? key,
   }) : super(key: key);
-
-  final bool isCard1;
 
   @override
   Widget build(BuildContext context) {
@@ -27,26 +23,7 @@ class CardDisplay extends StatelessWidget {
           final showPinyin = settingsNotifier.displayOptions[Settings.showPinyin] ?? false;
           final audioOnly = settingsNotifier.displayOptions[Settings.audioOnly] ?? false;
 
-          return Consumer<FlashcardsNotifier>(
-            builder: (_, flashcardsNotifier, __) {
-              return Column(
-                children: [
-                  if (isCard1) ...[
-                    buildCardContents(flashcardsNotifier.word1, setEnglishFirst, showPinyin, audioOnly, context),
-                  ] else ...[
-                    buildCardContents(flashcardsNotifier.word2, setEnglishFirst, showPinyin, audioOnly, context),
-                  ],
-                  ElevatedButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CreateFlashcardForm()),
-                    ),
-                    child: Text('Add New Flashcard'),
-                  ),
-                ],
-              );
-            },
-          );
+          return buildCardContents(word, setEnglishFirst, showPinyin, audioOnly, context);
         },
       ),
     );
@@ -102,5 +79,3 @@ class CardDisplay extends StatelessWidget {
     );
   }
 }
-
-

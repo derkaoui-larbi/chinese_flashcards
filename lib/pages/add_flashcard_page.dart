@@ -6,7 +6,7 @@ class AddFlashcardPage extends StatefulWidget {
   const AddFlashcardPage({Key? key}) : super(key: key);
 
   @override
-  State<AddFlashcardPage> createState() => _AddFlashcardPageState();
+  _AddFlashcardPageState createState() => _AddFlashcardPageState();
 }
 
 class _AddFlashcardPageState extends State<AddFlashcardPage> {
@@ -17,9 +17,9 @@ class _AddFlashcardPageState extends State<AddFlashcardPage> {
   void _submitFlashcard() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Add logic here to add the flashcard to the list
-      Provider.of<FlashcardsNotifier>(context, listen: false).addFlashcard(_frontText, _backText);
-      Navigator.pop(context);
+      final flashcardsNotifier = Provider.of<FlashcardsNotifier>(context, listen: false);
+      flashcardsNotifier.addFlashcard(flashcardsNotifier.currentTopic, _frontText, _backText);
+      Navigator.of(context).pop();
     }
   }
 
@@ -36,13 +36,13 @@ class _AddFlashcardPageState extends State<AddFlashcardPage> {
             children: <Widget>[
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Front Text'),
-                validator: (value) => value!.isEmpty ? 'Please enter some text' : null,
-                onSaved: (value) => _frontText = value!,
+                validator: (value) => value == null || value.isEmpty ? 'Please enter some text' : null,
+                onSaved: (value) => _frontText = value ?? '',
               ),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Back Text'),
-                validator: (value) => value!.isEmpty ? 'Please enter some text' : null,
-                onSaved: (value) => _backText = value!,
+                validator: (value) => value == null || value.isEmpty ? 'Please enter some text' : null,
+                onSaved: (value) => _backText = value ?? '',
               ),
               ElevatedButton(
                 onPressed: _submitFlashcard,

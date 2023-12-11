@@ -28,7 +28,7 @@ class _ReviewPageState extends State<ReviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(kAppBarHeight), child: CustomAppBar()),
+          preferredSize: Size.fromHeight(kAppBarHeight), child: CustomAppBar(topic: '')),
       body: Column(
         children: [
           Expanded(
@@ -49,7 +49,7 @@ class _ReviewPageState extends State<ReviewPage> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const FlashcardsPage()));
+                                builder: (context) => const FlashcardsPage(topic: '',)));
                       });
                     },
                   ),
@@ -65,7 +65,7 @@ class _ReviewPageState extends State<ReviewPage> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const FlashcardsPage()));
+                                builder: (context) => const FlashcardsPage(topic: '',)));
                       });
                     },
                   ),

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_flashcards/configs/constants.dart';
 import 'package:provider/provider.dart';
-
 import '../../animations/half_flip_animation.dart';
 import '../../animations/slide_animation.dart';
 import '../../enums/slide_direction.dart';
@@ -11,9 +10,7 @@ import '../../notifiers/flashcards_notifier.dart';
 import 'card_display.dart';
 
 class Card2 extends StatelessWidget {
-  const Card2({
-    Key? key,
-  }) : super(key: key);
+  const Card2({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,30 +18,23 @@ class Card2 extends StatelessWidget {
     return Consumer<FlashcardsNotifier>(
       builder: (_, notifier, __) => GestureDetector(
         onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity! > 100) {
-            notifier.runSwipeCard2(direction: SlideDirection.leftAway);
-            notifier.runSlideCard1();
-            notifier.setIgnoreTouch(ignore: true);
-            notifier.generateCurrentWord(context: context);
+          final velocity = details.primaryVelocity ?? 0;
+          if (velocity > 100) {
+            notifier.runSwipeCard2(SlideDirection.leftAway);
+          } else if (velocity < -100) {
+            notifier.runSwipeCard2(SlideDirection.rightAway);
           }
-          if (details.primaryVelocity! < -100) {
-            notifier.runSwipeCard2(direction: SlideDirection.rightAway);
-            notifier.runSlideCard1();
-            notifier.setIgnoreTouch(ignore: true);
-            notifier.generateCurrentWord(context: context);
-          }
+          notifier.runSlideCard1();
+          notifier.setIgnoreTouch(true);
+          notifier.generateCurrentWord(context);
         },
         child: HalfFlipAnimation(
           animate: notifier.flipCard2,
           reset: notifier.resetFlipCard2,
           flipFromHalfWay: true,
-          animationCompleted: () {
-            notifier.setIgnoreTouch(ignore: false);
-          },
+          animationCompleted: () => notifier.setIgnoreTouch(false),
           child: SlideAnimation(
-            animationCompleted: () {
-              notifier.resetCard2();
-            },
+            animationCompleted: () => notifier.resetCard2(),
             reset: notifier.resetSwipeCard2,
             animate: notifier.swipeCard2,
             direction: notifier.swipedDirection,
@@ -60,10 +50,10 @@ class Card2 extends StatelessWidget {
                   ),
                   color: Theme.of(context).primaryColor,
                 ),
-                child: Transform(
+                child: notifier.selectedWords.length > 1 ? Transform(
                     alignment: Alignment.center,
                     transform: Matrix4.rotationY(pi),
-                    child: const CardDisplay(isCard1: false)),
+                    child: CardDisplay(word: notifier.selectedWords[1])) : const SizedBox(),
               ),
             ),
           ),
