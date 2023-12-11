@@ -11,37 +11,40 @@ class GuideBox extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final heightPadding = size.height * 0.20;
     final widthPadding = size.width * 0.10;
+
     return FadeInAnimation(
       child: AlertDialog(
-        insetPadding: EdgeInsets.fromLTRB(
-            widthPadding, heightPadding, widthPadding, heightPadding),
-        content: Column(
-          children: [
-            if (isFirst) ...[
-              const Text(
-                'Double Tap\nTo Reveal Answer',
-                textAlign: TextAlign.center,
-              ),
-              Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Image.asset('assets/images/GuideDoubleTap.png'),
-              ))
-            ] else ...[
-              Expanded(
-                child: Row(
-                  children: const [
-                    GuideSwipe(
-                      isLeft: true,
-                    ),
-                    GuideSwipe(
-                      isLeft: false,
-                    ),
-                  ],
+        insetPadding: EdgeInsets.fromLTRB(widthPadding, heightPadding, widthPadding, heightPadding),
+        content: SizedBox(
+          height: size.height * 0.6, // Set a specific height for the AlertDialog content
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isFirst) ...[
+                const Text(
+                  'Double Tap\nTo Reveal Answer',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18),
                 ),
-              )
-            ]
-          ],
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Image.asset('assets/images/GuideDoubleTap.png'),
+                  ),
+                )
+              ] else ...[
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: const [
+                      GuideSwipe(isLeft: true),
+                      GuideSwipe(isLeft: false),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
@@ -50,12 +53,11 @@ class GuideBox extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.maybePop(context);
-                  },
-                  child: const Text('Got It!')),
+                onPressed: () => Navigator.maybePop(context),
+                child: const Text('Got It!'),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -63,10 +65,7 @@ class GuideBox extends StatelessWidget {
 }
 
 class GuideSwipe extends StatelessWidget {
-  const GuideSwipe({
-    required this.isLeft,
-    Key? key,
-  }) : super(key: key);
+  const GuideSwipe({required this.isLeft, Key? key}) : super(key: key);
 
   final bool isLeft;
 
@@ -74,22 +73,21 @@ class GuideSwipe extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          isLeft
-              ? const Text(
-                  'Swipe Left\nIf Incorrect',
-                  textAlign: TextAlign.left,
-                )
-              : const Text(
-                  'Swipe Right\nIf Correct',
-                  textAlign: TextAlign.right,
-                ),
+          Text(
+            isLeft ? 'Swipe Left\nIf Incorrect' : 'Swipe Right\nIf Correct',
+            textAlign: isLeft ? TextAlign.left : TextAlign.right,
+            style: TextStyle(fontSize: 16),
+          ),
           Expanded(
-              child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: isLeft
-                      ? Image.asset('assets/images/GuideLeftSwipe.png')
-                      : Image.asset('assets/images/GuideRightSwipe.png')))
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Image.asset(
+                  isLeft ? 'assets/images/GuideLeftSwipe.png' : 'assets/images/GuideRightSwipe.png'
+              ),
+            ),
+          ),
         ],
       ),
     );

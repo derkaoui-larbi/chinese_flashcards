@@ -34,30 +34,33 @@ class CardDisplay extends StatelessWidget {
       bool setEnglishFirst,
       bool showPinyin,
       bool audioOnly,
-      BuildContext context
-      ) {
+      BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (audioOnly) ...[
           TTSButton(word: word),
-        ] else if (!setEnglishFirst) ...[
-          buildTextBox(word.question, context, 3),
-          if (showPinyin) buildTextBox(word.pinyin, context, 1),
-          TTSButton(word: word),
         ] else ...[
-          buildImage(word.chapter),
-          buildTextBox(word.chapter, context, 1),
+          if (!setEnglishFirst) buildTextBox(word.question, context, 3),
+          if (showPinyin) buildTextBox(word.pinyin, context, 1),
+          if (setEnglishFirst) buildImage(word.chapter),
+          TTSButton(word: word),
         ],
       ],
     );
   }
 
   Expanded buildImage(String image) {
+    // Handling potential missing or incorrect image path
     return Expanded(
       flex: 4,
       child: Padding(
         padding: const EdgeInsets.all(18.0),
-        child: Image.asset('assets/images/$image.png'),
+        child: image.isNotEmpty
+            ? Image.asset('assets/images/$image.png', errorBuilder: (context, error, stackTrace) {
+          return Icon(Icons.image_not_supported); // Fallback icon
+        })
+            : Icon(Icons.image_not_supported), // Displayed if image string is empty
       ),
     );
   }
@@ -65,14 +68,13 @@ class CardDisplay extends StatelessWidget {
   Expanded buildTextBox(String text, BuildContext context, int flex) {
     return Expanded(
       flex: flex,
-      child: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: FittedBox(
           fit: BoxFit.contain,
           child: Text(
             text,
-            style: Theme.of(context).textTheme.headline1,
+            style: Theme.of(context).textTheme.headline4,
           ),
         ),
       ),

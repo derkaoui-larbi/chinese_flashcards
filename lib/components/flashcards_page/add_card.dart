@@ -25,7 +25,7 @@ class AddCard extends StatelessWidget {
           height: MediaQuery.of(context).size.height * 0.70,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20.0),
-            color: Colors.blueGrey[100],
+            color: Colors.black,
           ),
           child: const Center(
             child: Icon(Icons.add, size: 64, color: Colors.black54),

@@ -18,8 +18,17 @@ class _AddFlashcardPageState extends State<AddFlashcardPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final flashcardsNotifier = Provider.of<FlashcardsNotifier>(context, listen: false);
-      flashcardsNotifier.addFlashcard(flashcardsNotifier.currentTopic, _frontText, _backText);
-      Navigator.of(context).pop();
+
+      // Ensure that a current topic is selected before adding a flashcard
+      if (flashcardsNotifier.currentTopic.isNotEmpty) {
+        flashcardsNotifier.addFlashcard(flashcardsNotifier.currentTopic, _frontText, _backText);
+        Navigator.of(context).pop();
+      } else {
+        // Handle the case when no current topic is selected
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('No topic selected. Please select a topic first.'))
+        );
+      }
     }
   }
 
@@ -35,12 +44,12 @@ class _AddFlashcardPageState extends State<AddFlashcardPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Front Text'),
+                decoration: const InputDecoration(labelText: 'Question'),
                 validator: (value) => value == null || value.isEmpty ? 'Please enter some text' : null,
                 onSaved: (value) => _frontText = value ?? '',
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Back Text'),
+                decoration: const InputDecoration(labelText: 'Answer'),
                 validator: (value) => value == null || value.isEmpty ? 'Please enter some text' : null,
                 onSaved: (value) => _backText = value ?? '',
               ),

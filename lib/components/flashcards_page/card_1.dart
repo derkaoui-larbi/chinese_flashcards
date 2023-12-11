@@ -16,46 +16,50 @@ class Card1 extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Consumer<FlashcardsNotifier>(
-      builder: (_, notifier, __) => GestureDetector(
-        onDoubleTap: () {
-          notifier.runFlipCard1();
-          notifier.setIgnoreTouch(true);
-          SharedPreferences.getInstance().then((prefs) {
-            if (prefs.getBool('guidebox') == null) {
-              runGuideBox(context: context, isFirst: false);
-            }
-          });
-        },
-        child: HalfFlipAnimation(
-          animate: notifier.flipCard1,
-          reset: notifier.resetFlipCard1,
-          flipFromHalfWay: false,
-          animationCompleted: () => notifier.resetCard1(),
-          child: SlideAnimation(
-            animationDuration: 1000,
-            animationDelay: 200,
-            animationCompleted: () => notifier.setIgnoreTouch(false),
-            reset: notifier.resetSlideCard1,
-            animate: notifier.slideCard1 && !notifier.isRoundCompleted,
-            direction: SlideDirection.upIn,
-            child: Center(
-              child: Container(
-                width: size.width * 0.90,
-                height: size.height * 0.70,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(kCircularBorderRadius),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: kCardBorderWidth,
+      builder: (_, notifier, __) {
+        final word = notifier.currentTopic.isNotEmpty && notifier.selectedWords.isNotEmpty ? notifier.selectedWords[0] : null;
+
+        return GestureDetector(
+          onDoubleTap: () {
+            notifier.runFlipCard1();
+            notifier.setIgnoreTouch(true);
+            SharedPreferences.getInstance().then((prefs) {
+              if (prefs.getBool('guidebox') == null) {
+                runGuideBox(context: context, isFirst: false);
+              }
+            });
+          },
+          child: HalfFlipAnimation(
+            animate: notifier.flipCard1,
+            reset: notifier.resetFlipCard1,
+            flipFromHalfWay: false,
+            animationCompleted: () => notifier.resetCard1(),
+            child: SlideAnimation(
+              animationDuration: 1000,
+              animationDelay: 200,
+              animationCompleted: () => notifier.setIgnoreTouch(false),
+              reset: notifier.resetSlideCard1,
+              animate: notifier.slideCard1 && !notifier.isRoundCompleted,
+              direction: SlideDirection.upIn,
+              child: Center(
+                child: Container(
+                  width: size.width * 0.90,
+                  height: size.height * 0.70,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(kCircularBorderRadius),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: kCardBorderWidth,
+                    ),
+                    color: Theme.of(context).primaryColor,
                   ),
-                  color: Theme.of(context).primaryColor,
+                  child: word != null ? CardDisplay(word: word) : const SizedBox(),
                 ),
-                child: notifier.selectedWords.isNotEmpty ? CardDisplay(word: notifier.selectedWords[0]) : const SizedBox(),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

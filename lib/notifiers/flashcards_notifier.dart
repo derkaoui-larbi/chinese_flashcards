@@ -37,7 +37,29 @@ class FlashcardsNotifier extends ChangeNotifier {
       resetFlipCard2 = false,
       resetSwipeCard2 = false;
 
-  // Existing methods...
+  FlashcardsNotifier() {
+    _initializeHardcodedFlashcards();
+  }
+
+  void _initializeHardcodedFlashcards() {
+    topicsFlashcards['CSC1401'] = [
+      Word(topic: 'CSC1401', chapter: 'Computer Programming with C', question: "What does 'printf' do in C?", pinyin: "It prints formatted output to the screen."),
+      Word(topic: 'CSC1401', chapter: 'Computer Programming with C', question: "What is a pointer in C?", pinyin: "A variable that stores the memory address of another variable."),
+      // Add more flashcards as needed
+    ];
+
+    topicsFlashcards['CSC2302'] = [
+      Word(topic: 'CSC23023', chapter: 'Data Structures', question: "What is a linked list?", pinyin: "A sequence of nodes where each node points to the next node."),
+      Word(topic: 'CSC23023', chapter: 'Data Structures',  question: "What is a stack typically used for?", pinyin: "For LIFO (Last In, First Out) operations."),
+      // Add more flashcards as needed
+    ];
+
+    topicsFlashcards['CSC3324'] = [
+      Word(topic: 'CSC3324', chapter: 'Software Engineering', question: "What is Agile methodology?", pinyin: "A set of principles for software development."),
+      Word(topic: 'CSC3324', chapter: 'Software Engineering', question: "What is a software development life cycle?", pinyin: "A process for planning, creating, testing, and deploying an information system."),
+      // Add more flashcards as needed
+    ];
+  }
 
   void calculateCorrectPercentage() {
     if (cardTally != 0) {
@@ -91,8 +113,9 @@ class FlashcardsNotifier extends ChangeNotifier {
   }
 
   String getRandomImageUrl() {
-    List<String> defaultImages = ['default1.png', 'default2.png', 'default3.png'];
-    return 'assets/images/' + (defaultImages..shuffle()).first;
+    //List<String> defaultImages = ['default1.png', 'default2.png', 'default3.png'];
+    //return 'assets/images/' + (defaultImages..shuffle()).first;
+    return 'assets/images/default.png';
   }
 
   void addFlashcard(String topicName, String frontText, String backText) {
@@ -116,9 +139,10 @@ class FlashcardsNotifier extends ChangeNotifier {
   }
 
   List<String> getAllTopics() {
-    List<String> allTopics = ['CSC2303', 'CSC3324', 'CSC1401']; // Hardcoded topics
-    allTopics.addAll(topicsFlashcards.keys); // Add dynamically added topics
-    return allTopics;
+    //List<String> allTopics = ['CSC2302', 'CSC3324', 'CSC1401']; // Hardcoded topics
+    //allTopics.addAll(topicsFlashcards.keys); // Add dynamically added topics
+    //return allTopics;
+    return topicsFlashcards.keys.toList();
   }
 
   void generateAllSelectedWords() {

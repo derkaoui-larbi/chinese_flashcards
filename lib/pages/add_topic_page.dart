@@ -49,19 +49,19 @@ class _AddTopicPageState extends State<AddTopicPage> {
                 ),
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Image URL'),
-                  onSaved: (value) => _imageUrl = value ?? '',
+                  onSaved: (value) => _imageUrl = value ?? 'assets/images/default.png',
                 ),
                 ..._flashcards.map((flashcard) {
                   return Card(
                     child: Column(
                       children: [
                         TextFormField(
-                          decoration: const InputDecoration(labelText: 'Front Text'),
+                          decoration: const InputDecoration(labelText: 'Question'),
                           validator: (value) => value == null || value.isEmpty ? 'Please enter front text' : null,
                           onSaved: (value) => flashcard['front'] = value ?? '',
                         ),
                         TextFormField(
-                          decoration: const InputDecoration(labelText: 'Back Text'),
+                          decoration: const InputDecoration(labelText: 'Answer'),
                           validator: (value) => value == null || value.isEmpty ? 'Please enter back text' : null,
                           onSaved: (value) => flashcard['back'] = value ?? '',
                         ),
