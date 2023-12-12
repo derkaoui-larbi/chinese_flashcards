@@ -23,6 +23,11 @@ class CardDisplay extends StatelessWidget {
           final showPinyin = settingsNotifier.displayOptions[Settings.showPinyin] ?? false;
           final audioOnly = settingsNotifier.displayOptions[Settings.audioOnly] ?? false;
 
+          // Check if the word has content to display
+          if (word.question.isEmpty || word.pinyin.isEmpty) {
+            return _noFlashcardsMessage();
+          }
+
           return buildCardContents(word, setEnglishFirst, showPinyin, audioOnly, context);
         },
       ),
@@ -41,27 +46,11 @@ class CardDisplay extends StatelessWidget {
         if (audioOnly) ...[
           TTSButton(word: word),
         ] else ...[
-          if (!setEnglishFirst) buildTextBox(word.question, context, 3),
+          if (!setEnglishFirst || showPinyin) buildTextBox(word.question, context, 3),
           if (showPinyin) buildTextBox(word.pinyin, context, 1),
-          if (setEnglishFirst) buildImage(word.chapter),
           TTSButton(word: word),
         ],
       ],
-    );
-  }
-
-  Expanded buildImage(String image) {
-    // Handling potential missing or incorrect image path
-    return Expanded(
-      flex: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: image.isNotEmpty
-            ? Image.asset('assets/images/$image.png', errorBuilder: (context, error, stackTrace) {
-          return Icon(Icons.image_not_supported); // Fallback icon
-        })
-            : Icon(Icons.image_not_supported), // Displayed if image string is empty
-      ),
     );
   }
 
@@ -76,6 +65,19 @@ class CardDisplay extends StatelessWidget {
             text,
             style: Theme.of(context).textTheme.headline4,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _noFlashcardsMessage() {
+    return Center(
+      child: Text(
+        'This topic has no flashcards.',
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey,
         ),
       ),
     );

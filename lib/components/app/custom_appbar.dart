@@ -28,8 +28,8 @@ class CustomAppBar extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Hero(
           tag: topic,
-          child: Image.asset('assets/images/$topic.png', errorBuilder: (context, error, stackTrace) {
-            return const Icon(Icons.error); // Fallback if the image is not found
+          child: Image.asset('assets/images/default.png', errorBuilder: (context, error, stackTrace) {
+            return const Icon(Icons.dashboard_customize); // Fallback if the image is not found
           }),
         ),
       ),

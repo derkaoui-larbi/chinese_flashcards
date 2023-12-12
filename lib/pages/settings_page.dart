@@ -20,12 +20,16 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   @override
+  void initState() {
+    super.initState();
+    Provider.of<SettingsNotifier>(context, listen: false).loadPreferences();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<SettingsNotifier>(
       builder: (_, notifier, __) {
-        bool audioFirst = notifier.displayOptions.entries
-            .firstWhere((element) => element.key == Settings.audioOnly)
-            .value;
+        bool audioFirst = notifier.displayOptions[Settings.audioOnly] ?? false;
 
         return Scaffold(
           appBar: const PreferredSize(
@@ -39,7 +43,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     disabled: audioFirst,
                     displayOption: Settings.englishFirst,
                   ),
-                  const SwitchButton(
+                  SwitchButton(
+                    disabled: audioFirst,
                     displayOption: Settings.showPinyin,
                   ),
                   const SwitchButton(
@@ -56,23 +61,22 @@ class _SettingsPageState extends State<SettingsPage> {
                     callback: () async {
                       notifier.resetSettings();
                       runQuickBox(context: context, text: 'Settings Reset');
+                      await DatabaseManager().removeDatabase();
                       Future.delayed(const Duration(milliseconds: 1000), () {
                         if (!mounted) return;
                         Navigator.maybePop(context);
                       });
-                      await DatabaseManager().removeDatabase();
                     },
                   ),
                   SettingsTile(
                     title: 'Exit App',
                     icon: const Icon(Icons.exit_to_app),
                     callback: () {
-                      SystemChannels.platform
-                          .invokeMethod('SystemNavigator.pop');
+                      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
                     },
                   ),
                 ],
-              )
+              ),
             ],
           ),
         );

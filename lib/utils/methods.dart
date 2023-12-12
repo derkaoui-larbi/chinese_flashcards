@@ -11,7 +11,7 @@ import '../enums/settings.dart';
 
 loadSession({required BuildContext context, required String topic}) {
   Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const FlashcardsPage(topic: '',)));
+      MaterialPageRoute(builder: (context) => FlashcardsPage(topic: topic,)));
   Provider.of<FlashcardsNotifier>(context, listen: false)
       .setTopic(topic);
 }

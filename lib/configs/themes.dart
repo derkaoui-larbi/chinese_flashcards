@@ -2,67 +2,81 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flashcards/configs/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-final appTheme = ThemeData(
-    primaryColor: kRed,
-    textTheme: TextTheme(
-      bodyText2: TextStyle(
-          color: Colors.white,
-          fontSize: 15,
-          fontFamily: GoogleFonts.notoSans().fontFamily),
-      headline1: TextStyle(
-        color: Colors.white,
-        fontSize: 58,
-        fontFamily: GoogleFonts.notoSans().fontFamily,
-        fontWeight: FontWeight.bold,
-      ),
+final ThemeData appTheme = ThemeData(
+  primaryColor: kRed,
+  scaffoldBackgroundColor: kYellow,
+
+  // Text Theme
+  textTheme: TextTheme(
+    bodyText2: GoogleFonts.notoSans(
+      fontSize: 15,
+      color: Colors.black, // Changed to black for better visibility
     ),
-    appBarTheme: AppBarTheme(
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        fontFamily: GoogleFonts.notoSans().fontFamily,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
-      color: kRed,
+    headline1: GoogleFonts.notoSans(
+      fontSize: 58,
+      fontWeight: FontWeight.bold,
+      color: Colors.black, // Changed to black for better visibility
     ),
-    scaffoldBackgroundColor: kYellow,
-    dialogTheme: DialogTheme(
+  ),
+
+  // App Bar Theme
+  appBarTheme: AppBarTheme(
+    elevation: 0,
+    centerTitle: true,
+    color: kRed,
+    titleTextStyle: GoogleFonts.notoSans(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      color: Colors.white, // White color for contrast against red AppBar
+    ),
+  ),
+
+  // Dialog Theme
+  dialogTheme: DialogTheme(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(kCircularBorderRadius),
+    ),
+    backgroundColor: kRed,
+    contentTextStyle: GoogleFonts.notoSans(
+      fontSize: 20,
+      color: Colors.white, // White color for contrast
+    ),
+    titleTextStyle: GoogleFonts.notoSans(
+      fontSize: 20,
+      color: Colors.white, // White color for contrast
+    ),
+  ),
+
+  // Elevated Button Theme
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      primary: kYellow,
+      onPrimary: Colors.black, // Text color on buttons
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(kCircularBorderRadius),
+        side: const BorderSide(color: Colors.white),
       ),
-      backgroundColor: kRed,
-      contentTextStyle: TextStyle(
-          fontFamily: GoogleFonts.notoSans().fontFamily,
-          fontSize: 20,
-          color: Colors.white),
-      titleTextStyle: TextStyle(
-          fontFamily: GoogleFonts.notoSans().fontFamily,
-          fontSize: 20,
-          color: Colors.white),
+      textStyle: GoogleFonts.notoSans(
+        fontSize: 12,
+      ),
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(kCircularBorderRadius),
-              side: const BorderSide(
-                color: Colors.white,
-              ),
-            ),
-            primary: kYellow,
-            textStyle: TextStyle(
-              fontFamily: GoogleFonts.notoSans().fontFamily,
-              color: Colors.white,
-              fontSize: 12,
-            ))),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: kRed,
-      linearTrackColor: Colors.grey,
-    ),
-    switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.all<Color>(kRed),
-    ),
-    listTileTheme: const ListTileThemeData(
-      textColor: Colors.white,
-      iconColor: Colors.white,
-    ));
+  ),
+
+  // Progress Indicator Theme
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    color: kRed,
+    linearTrackColor: Colors.grey,
+  ),
+
+  // Switch Theme
+  switchTheme: SwitchThemeData(
+    thumbColor: MaterialStateProperty.all<Color>(kRed),
+    trackColor: MaterialStateProperty.all<Color>(Colors.grey), // Added for better visibility
+  ),
+
+  // ListTile Theme
+  listTileTheme: const ListTileThemeData(
+    textColor: Colors.black, // Changed to black for better visibility
+    iconColor: Colors.black, // Changed to black for better visibility
+  ),
+);

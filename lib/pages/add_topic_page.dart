@@ -12,7 +12,7 @@ class AddTopicPage extends StatefulWidget {
 class _AddTopicPageState extends State<AddTopicPage> {
   final _formKey = GlobalKey<FormState>();
   String _topicName = '';
-  String _imageUrl = '';
+  String _imageUrl = 'assets/images/default.png'; // Default image URL
   List<Map<String, String>> _flashcards = [];
 
   void _addFlashcard() {
@@ -25,7 +25,10 @@ class _AddTopicPageState extends State<AddTopicPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final flashcardsNotifier = Provider.of<FlashcardsNotifier>(context, listen: false);
-      flashcardsNotifier.addTopicWithFlashcards(_topicName, _flashcards, _imageUrl);
+
+      // Validate and pass the imageUrl only if it's not empty
+      String imageUrl = _imageUrl.isNotEmpty ? _imageUrl : 'assets/images/default.png';
+      flashcardsNotifier.addTopicWithFlashcards(_topicName, _flashcards, imageUrl);
       Navigator.pop(context);
     }
   }
@@ -49,7 +52,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
                 ),
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Image URL'),
-                  onSaved: (value) => _imageUrl = value ?? 'assets/images/default.png',
+                  onSaved: (value) => _imageUrl = value?.trim() ?? 'assets/images/default.png',
                 ),
                 ..._flashcards.map((flashcard) {
                   return Card(
@@ -57,12 +60,12 @@ class _AddTopicPageState extends State<AddTopicPage> {
                       children: [
                         TextFormField(
                           decoration: const InputDecoration(labelText: 'Question'),
-                          validator: (value) => value == null || value.isEmpty ? 'Please enter front text' : null,
+                          validator: (value) => value == null || value.isEmpty ? 'Please enter a question' : null,
                           onSaved: (value) => flashcard['front'] = value ?? '',
                         ),
                         TextFormField(
                           decoration: const InputDecoration(labelText: 'Answer'),
-                          validator: (value) => value == null || value.isEmpty ? 'Please enter back text' : null,
+                          validator: (value) => value == null || value.isEmpty ? 'Please enter an answer' : null,
                           onSaved: (value) => flashcard['back'] = value ?? '',
                         ),
                       ],
