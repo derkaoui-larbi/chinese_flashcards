@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flashcards/Authentication/main_screens/LoginPage.dart';
 import 'package:flutter_flashcards/Authentication/main_screens/RegisterPage.dart';
-
 import '../Users/Userc.dart';
 import '../databases/database_manager.dart';
 
@@ -10,27 +9,49 @@ class LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-
-    Userc user = Userc(fullName: "aymane", email:"aymaneaitmansour@gmail.com", password: "aymaneaitmansour@gmail.com", role: Role.student);
-    DatabaseManager().insertUser(user);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome to MyFlashcardsApp'),
+        title: Text(
+          'Welcome to MyFlashcardsApp',
+          style: TextStyle(
+            fontSize: 20.0,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
-              child: Text('Login'),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blueAccent,
+                onPrimary: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+              ),
+              child: Text(
+                'Login',
+                style: TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
               onPressed: () {
                 Navigator.pushNamed(context, LoginPage.id);
               },
             ),
+            SizedBox(height: 20.0),
             ElevatedButton(
-              child: Text('Register'),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green,
+                onPrimary: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+              ),
+              child: Text(
+                'Register',
+                style: TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
               onPressed: () {
                 Navigator.pushNamed(context, RegisterPage.id);
               },
