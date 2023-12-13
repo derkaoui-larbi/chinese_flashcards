@@ -1,4 +1,4 @@
-import 'package:flutter_flashcards/Users/User.dart';
+import 'package:flutter_flashcards/Users/Userc.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/word.dart';
@@ -88,4 +88,22 @@ class DatabaseManager {
     final path = join(devicesPath, _database);
     await deleteDatabase(path);
   }
+
+
+
+  Future<bool> authenticateUser(String email, String password) async {
+  final db = await initDatabase();
+  final List<Map<String, dynamic>> result = await db.query(
+  _usersTable,
+  where: 'email = ? AND password = ?',
+  whereArgs: [email, password],
+  );
+
+  return result.isNotEmpty;
+  }
+
+
+
+
 }
+
