@@ -20,7 +20,7 @@ class HeaderButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isDisabled ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          primary: Theme.of(context).primaryColor,
+          backgroundColor: Theme.of(context).primaryColor,
         ),
         child: Text(title),
       ),

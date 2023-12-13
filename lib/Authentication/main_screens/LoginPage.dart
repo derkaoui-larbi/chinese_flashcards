@@ -84,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff447def),
+                    primary: Color(0xff447def),
                     padding: EdgeInsets.symmetric(vertical: 10.0),
                   ),
                   onPressed: () async {
@@ -93,11 +93,13 @@ class _LoginPageState extends State<LoginPage> {
                       _wrongEmail = false;
                       _wrongPassword = false;
                     });
-                    try {
+
+                    Navigator.pushReplacementNamed(context, HomePage.id);
+                    /*try {
                       bool isAuthenticated = await DatabaseManager().authenticateUser(email!, password!);
 
                       if (isAuthenticated) {
-                        Navigator.pushReplacementNamed(context, HomePage.id);
+
                       } else {
                         setState(() {
                           _showSpinner = false;
@@ -118,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                           passwordText = 'Wrong password';
                         }
                       });
-                    }
+                    }*/
                   },
                   child: Text(
                     'Login',

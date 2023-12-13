@@ -22,11 +22,8 @@ class FlashcardsNotifier extends ChangeNotifier {
   bool slideCard1 = false, flipCard1 = false, flipCard2 = false, swipeCard2 = false;
   bool resetSlideCard1 = false, resetFlipCard1 = false, resetFlipCard2 = false, resetSwipeCard2 = false;
 
-  final DatabaseManager dbManager = DatabaseManager();
-
   FlashcardsNotifier() {
     _initializeHardcodedFlashcards();
-    _loadFlashcardsFromDatabase();
   }
 
   /*Future<void> _loadFlashcardsFromDatabase() async {
@@ -42,17 +39,6 @@ class FlashcardsNotifier extends ChangeNotifier {
     }
     notifyListeners();
   }*/
-  Future<void> _loadFlashcardsFromDatabase() async {
-    final allWords = await dbManager.selectWords();
-    for (var word in allWords) {
-      if (topicsFlashcards.containsKey(word.topic)) {
-        topicsFlashcards[word.topic]!.add(word);
-      } else {
-        topicsFlashcards[word.topic] = [word];
-      }
-    }
-    notifyListeners();
-  }
 
   void _initializeHardcodedFlashcards() {
     // Hardcoded flashcards initialization
@@ -120,23 +106,7 @@ class FlashcardsNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addTopicWithFlashcards(String topicName, List<Map<String, String>> flashcardsData) async {
-    List<Word> flashcards = [];
-    for (var data in flashcardsData) {
-      final word = Word(
-        topic: topicName,
-        chapter: '',
-        question: data['front'] ?? '',
-        pinyin: data['back'] ?? '',
-      );
-      flashcards.add(word);
-      await dbManager.insertWord(word: word);
-    }
-    topicsFlashcards[topicName] = flashcards;
-    notifyListeners();
-  }
-
-  /*void addTopicWithFlashcards(String topicName, List<Map<String, String>> flashcardsData, String imageUrl) {
+  void addTopicWithFlashcards(String topicName, List<Map<String, String>> flashcardsData, String imageUrl) {
     List<Word> flashcards = flashcardsData.map((data) => Word(
       topic: topicName,
       chapter: '',
@@ -147,7 +117,7 @@ class FlashcardsNotifier extends ChangeNotifier {
     topicsFlashcards[topicName] = flashcards;
     //topicImages[topicName] = imageUrl.isNotEmpty ? imageUrl : getRandomImageUrl();
     notifyListeners();
-  }*/
+  }
 
   String getRandomImageUrl() {
     //List<String> defaultImages = ['default1.png', 'default2.png', 'default3.png'];
@@ -174,7 +144,6 @@ class FlashcardsNotifier extends ChangeNotifier {
     }
     notifyListeners();
   }
-
 
   void refreshFlashcards() {
     notifyListeners();

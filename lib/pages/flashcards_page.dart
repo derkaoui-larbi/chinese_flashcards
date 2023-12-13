@@ -59,7 +59,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
                 : Center(
               child: Text(
                 'No flashcards available for this topic',
-                style: Theme.of(context).textTheme.headline4,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
             Align(
