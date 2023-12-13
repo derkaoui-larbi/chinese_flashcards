@@ -26,6 +26,7 @@ class DatabaseManager {
       await db.execute('''
         CREATE TABLE $_wordsTable (
           topic TEXT, 
+          chapter TEXT,
           english TEXT PRIMARY KEY, 
           pinyin TEXT
         )

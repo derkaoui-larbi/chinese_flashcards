@@ -73,7 +73,19 @@ class _HomePageState extends State<HomePage> {
             itemCount: topics.length + 1, // Plus one for the add button
             itemBuilder: (context, index) {
               if (index < topics.length) {
-                return TopicTile(topic: topics[index]);
+                //return TopicTile(topic: topics[index]);
+                return GestureDetector(
+                  onTap: () {
+                    notifier.setTopic(topics[index]);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FlashcardsPage(topic: topics[index]),
+                      ),
+                    );
+                  },
+                  child: TopicTile(topic: topics[index]),
+                );
               } else {
                 return GestureDetector(
                   onTap: () => Navigator.push(

@@ -6,58 +6,79 @@ import 'package:flutter_flashcards/data/words.dart';
 import 'package:flutter_flashcards/enums/slide_direction.dart';
 import 'package:flutter_flashcards/models/word.dart';
 
-class FlashcardsNotifier extends ChangeNotifier {
-  int roundTally = 0,
-      cardTally = 0,
-      correctTally = 0,
-      incorrectTally = 0,
-      correctPercentage = 0;
+import '../databases/database_manager.dart';
 
+class FlashcardsNotifier extends ChangeNotifier {
+  int roundTally = 0, cardTally = 0, correctTally = 0, incorrectTally = 0, correctPercentage = 0;
   double percentComplete = 0.0;
-  Map<String, List<Word>> topicsFlashcards = {}; // Map to store topics and their flashcards
-  Map<String, String> topicImages = {};
+  Map<String, List<Word>> topicsFlashcards = {};
   String currentTopic = "";
-  Word word1 = Word(topic: "", chapter: "Loading", question: "", pinyin: "");
-  Word word2 = Word(topic: "", chapter: "Loading", question: "", pinyin: "");
+  Word word1 = Word.empty();
+  Word word2 = Word.empty();
   List<Word> selectedWords = [];
   List<Word> incorrectCards = [];
-
-  bool isFirstRound = true,
-      isRoundCompleted = false,
-      isSessionCompleted = false,
-      ignoreTouches = true;
-
+  bool isFirstRound = true, isRoundCompleted = false, isSessionCompleted = false, ignoreTouches = false;
   SlideDirection swipedDirection = SlideDirection.none;
-  bool slideCard1 = false,
-      flipCard1 = false,
-      flipCard2 = false,
-      swipeCard2 = false;
-  bool resetSlideCard1 = false,
-      resetFlipCard1 = false,
-      resetFlipCard2 = false,
-      resetSwipeCard2 = false;
+  bool slideCard1 = false, flipCard1 = false, flipCard2 = false, swipeCard2 = false;
+  bool resetSlideCard1 = false, resetFlipCard1 = false, resetFlipCard2 = false, resetSwipeCard2 = false;
+
+  final DatabaseManager dbManager = DatabaseManager();
 
   FlashcardsNotifier() {
     _initializeHardcodedFlashcards();
+    _loadFlashcardsFromDatabase();
+  }
+
+  /*Future<void> _loadFlashcardsFromDatabase() async {
+    final dbManager = DatabaseManager();
+    await dbManager.initializeHardcodedData();
+    final allWords = await dbManager.selectWords();
+    for (var word in allWords) {
+      if (topicsFlashcards.containsKey(word.topic)) {
+        topicsFlashcards[word.topic]!.add(word);
+      } else {
+        topicsFlashcards[word.topic] = [word];
+      }
+    }
+    notifyListeners();
+  }*/
+  Future<void> _loadFlashcardsFromDatabase() async {
+    final allWords = await dbManager.selectWords();
+    for (var word in allWords) {
+      if (topicsFlashcards.containsKey(word.topic)) {
+        topicsFlashcards[word.topic]!.add(word);
+      } else {
+        topicsFlashcards[word.topic] = [word];
+      }
+    }
+    notifyListeners();
   }
 
   void _initializeHardcodedFlashcards() {
-    topicsFlashcards['CSC1401'] = [
+    // Hardcoded flashcards initialization
+    topicsFlashcards['CSC1401'] = _createProgrammingFlashcards();
+    topicsFlashcards['CSC2302'] = _createDataStructuresFlashcards();
+    topicsFlashcards['CSC3324'] = _createSoftwareEngineeringFlashcards();
+  }
+
+  List<Word> _createProgrammingFlashcards() {
+    return [
       Word(topic: 'CSC1401', chapter: 'Computer Programming with C', question: "What does 'printf' do in C?", pinyin: "It prints formatted output to the screen."),
       Word(topic: 'CSC1401', chapter: 'Computer Programming with C', question: "What is a pointer in C?", pinyin: "A variable that stores the memory address of another variable."),
-      // Add more flashcards as needed
     ];
+  }
 
-    topicsFlashcards['CSC2302'] = [
-      Word(topic: 'CSC23023', chapter: 'Data Structures', question: "What is a linked list?", pinyin: "A sequence of nodes where each node points to the next node."),
-      Word(topic: 'CSC23023', chapter: 'Data Structures',  question: "What is a stack typically used for?", pinyin: "For LIFO (Last In, First Out) operations."),
-      // Add more flashcards as needed
+  List<Word> _createDataStructuresFlashcards() {
+    return [
+      Word(topic: 'CSC2302', chapter: 'Data Structures', question: "What is a linked list?", pinyin: "A sequence of nodes where each node points to the next node."),
+      Word(topic: 'CSC2302', chapter: 'Data Structures', question: "What is a stack typically used for?", pinyin: "For LIFO (Last In, First Out) operations."),
     ];
+  }
 
-    topicsFlashcards['CSC3324'] = [
+  List<Word> _createSoftwareEngineeringFlashcards() {
+    return [
       Word(topic: 'CSC3324', chapter: 'Software Engineering', question: "What is Agile methodology?", pinyin: "A set of principles for software development."),
       Word(topic: 'CSC3324', chapter: 'Software Engineering', question: "What is a software development life cycle?", pinyin: "A process for planning, creating, testing, and deploying an information system."),
-      // Add more flashcards as needed
     ];
   }
 
@@ -99,7 +120,23 @@ class FlashcardsNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addTopicWithFlashcards(String topicName, List<Map<String, String>> flashcardsData, String imageUrl) {
+  Future<void> addTopicWithFlashcards(String topicName, List<Map<String, String>> flashcardsData) async {
+    List<Word> flashcards = [];
+    for (var data in flashcardsData) {
+      final word = Word(
+        topic: topicName,
+        chapter: '',
+        question: data['front'] ?? '',
+        pinyin: data['back'] ?? '',
+      );
+      flashcards.add(word);
+      await dbManager.insertWord(word: word);
+    }
+    topicsFlashcards[topicName] = flashcards;
+    notifyListeners();
+  }
+
+  /*void addTopicWithFlashcards(String topicName, List<Map<String, String>> flashcardsData, String imageUrl) {
     List<Word> flashcards = flashcardsData.map((data) => Word(
       topic: topicName,
       chapter: '',
@@ -108,17 +145,16 @@ class FlashcardsNotifier extends ChangeNotifier {
     )).toList();
 
     topicsFlashcards[topicName] = flashcards;
-    topicImages[topicName] = imageUrl.isNotEmpty ? imageUrl : getRandomImageUrl();
+    //topicImages[topicName] = imageUrl.isNotEmpty ? imageUrl : getRandomImageUrl();
     notifyListeners();
-  }
+  }*/
 
   String getRandomImageUrl() {
     //List<String> defaultImages = ['default1.png', 'default2.png', 'default3.png'];
     //return 'assets/images/' + (defaultImages..shuffle()).first;
     return 'assets/images/default.png';
   }
-
-  void addFlashcard(String topicName, String frontText, String backText) {
+  Future<void> addFlashcard(String topicName, String frontText, String backText) async {
     final newFlashcard = Word(
       topic: topicName,
       chapter: '',
@@ -126,6 +162,11 @@ class FlashcardsNotifier extends ChangeNotifier {
       pinyin: backText,
     );
 
+    // Add to database
+    final dbManager = DatabaseManager();
+    await dbManager.insertWord(word: newFlashcard);
+
+    // Add to in-memory list
     if (topicsFlashcards.containsKey(topicName)) {
       topicsFlashcards[topicName]?.add(newFlashcard);
     } else {
@@ -133,6 +174,7 @@ class FlashcardsNotifier extends ChangeNotifier {
     }
     notifyListeners();
   }
+
 
   void refreshFlashcards() {
     notifyListeners();
@@ -146,24 +188,20 @@ class FlashcardsNotifier extends ChangeNotifier {
   }
 
   void generateAllSelectedWords() {
-    words.shuffle();
-    selectedWords.clear();
-    isRoundCompleted = false;
-    isFirstRound = true;
-    if (currentTopic == 'Random 5') {
-      selectedWords.addAll(words.take(5));
-    } else if (currentTopic == 'Random 20') {
-      selectedWords.addAll(words.take(20));
-    } else if (currentTopic == 'Test All') {
-      selectedWords.addAll(words);
-    } else if (currentTopic != 'Review') {
-      selectedWords.addAll(words.where((element) => element.topic == currentTopic));
+    if (topicsFlashcards.containsKey(currentTopic) && topicsFlashcards[currentTopic]!.isNotEmpty) {
+      selectedWords.clear();
+      selectedWords.addAll(topicsFlashcards[currentTopic]!);
+      isRoundCompleted = false;
+      isFirstRound = true;
+      roundTally++;
+      cardTally = selectedWords.length;
+      correctTally = 0;
+      incorrectTally = 0;
+      resetProgressBar();
+    } else {
+      selectedWords.clear();
+      notifyListeners();
     }
-    roundTally++;
-    cardTally = selectedWords.length;
-    correctTally = 0;
-    incorrectTally = 0;
-    resetProgressBar();
   }
 
   void generateCurrentWord(BuildContext context) {

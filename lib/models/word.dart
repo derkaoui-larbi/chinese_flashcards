@@ -5,26 +5,44 @@ class Word {
   final String question;
   final String pinyin;
 
-  Word(
-      {required this.topic,//topic
-      required this.chapter,//english
-      required this.question,//character
-      required this.pinyin});//pinyin
+  // Constructor for creating a Word with data.
+  Word({
+    this.id,
+    required this.topic,
+    required this.chapter,
+    required this.question,
+    required this.pinyin,
+  });
 
+  // Named constructor for creating an empty Word object.
+  Word.empty()
+      : id = null,
+        topic = '',
+        chapter = '',
+        question = '',
+        pinyin = '';
+
+  // Convert a Word object into a Map. Useful for database operations.
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'topic': topic,
       'chapter': chapter,
-      'character': question,
-      'pinyin': pinyin
+      'question': question,
+      'pinyin': pinyin,
     };
   }
 
+  // Create a Word object from a Map. Useful when retrieving data from a database.
   factory Word.fromMap({required Map<String, dynamic> map}) {
     return Word(
-        topic: map['topic'],
-        chapter: map['chapter'],
-        question: map['character'],
-        pinyin: map['pinyin']);
+      id: map['id'],
+      topic: map['topic'],
+      chapter: map['chapter'],
+      question: map['question'],
+      pinyin: map['pinyin'],
+    );
   }
+
+// Additional methods or properties, if needed, can be added here.
 }

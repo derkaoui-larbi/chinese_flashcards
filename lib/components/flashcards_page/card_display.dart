@@ -7,75 +7,63 @@ import '../../enums/settings.dart';
 
 class CardDisplay extends StatelessWidget {
   final Word word;
+  final bool showQuestion; // New parameter to indicate question/answer
 
   const CardDisplay({
     required this.word,
+    required this.showQuestion, // Accept this parameter
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(28.0),
-      child: Consumer<SettingsNotifier>(
-        builder: (_, settingsNotifier, __) {
-          final setEnglishFirst = settingsNotifier.displayOptions[Settings.englishFirst] ?? false;
-          final showPinyin = settingsNotifier.displayOptions[Settings.showPinyin] ?? false;
-          final audioOnly = settingsNotifier.displayOptions[Settings.audioOnly] ?? false;
+    final settingsNotifier = Provider.of<SettingsNotifier>(context);
+    // Determine what content to display based on the showQuestion flag
+    final contentToShow = showQuestion ? word.question : word.pinyin;
 
-          // Check if the word has content to display
-          if (word.question.isEmpty || word.pinyin.isEmpty) {
-            return _noFlashcardsMessage();
-          }
+    // Check if content is available
+    if (contentToShow.isEmpty) {
+      return _noFlashcardsMessage();
+    }
 
-          return buildCardContents(word, setEnglishFirst, showPinyin, audioOnly, context);
-        },
-      ),
-    );
-  }
-
-  Column buildCardContents(
-      Word word,
-      bool setEnglishFirst,
-      bool showPinyin,
-      bool audioOnly,
-      BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (audioOnly) ...[
-          TTSButton(word: word),
-        ] else ...[
-          if (!setEnglishFirst || showPinyin) buildTextBox(word.question, context, 3),
-          if (showPinyin) buildTextBox(word.pinyin, context, 1),
-          TTSButton(word: word),
-        ],
-      ],
-    );
-  }
-
-  Expanded buildTextBox(String text, BuildContext context, int flex) {
-    return Expanded(
-      flex: flex,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.headline4,
-          ),
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.blueGrey[200], // Background color to distinguish the card
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: Offset(0, 4), // changes position of shadow
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              contentToShow,
+              style: Theme.of(context).textTheme.headline4?.copyWith(color: Colors.black87),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            if (!settingsNotifier.displayOptions[Settings.audioOnly]! ?? true)
+              TTSButton(word: word, iconSize: 30), // Smaller TTS button
+          ],
         ),
       ),
     );
   }
 
   Widget _noFlashcardsMessage() {
-    return Center(
+    return const Center(
       child: Text(
         'This topic has no flashcards.',
         style: TextStyle(
-          fontSize: 20,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
           color: Colors.grey,
         ),

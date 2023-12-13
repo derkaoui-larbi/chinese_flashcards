@@ -28,7 +28,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
 
       // Validate and pass the imageUrl only if it's not empty
       String imageUrl = _imageUrl.isNotEmpty ? _imageUrl : 'assets/images/default.png';
-      flashcardsNotifier.addTopicWithFlashcards(_topicName, _flashcards, imageUrl);
+      flashcardsNotifier.addTopicWithFlashcards(_topicName, _flashcards);
       Navigator.pop(context);
     }
   }

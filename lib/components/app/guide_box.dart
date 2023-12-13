@@ -33,10 +33,10 @@ class GuideBox extends StatelessWidget {
                   ),
                 )
               ] else ...[
-                Expanded(
+                const Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
+                    children: [
                       GuideSwipe(isLeft: true),
                       GuideSwipe(isLeft: false),
                     ],
