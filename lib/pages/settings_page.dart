@@ -10,6 +10,7 @@ import '../components/settings/switch_button.dart';
 import '../configs/constants.dart';
 import '../databases/database_manager.dart';
 import '../enums/settings.dart';
+import 'LandingPage.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -72,7 +73,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: 'Exit App',
                     icon: const Icon(Icons.exit_to_app),
                     callback: () {
-                      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+
+                      Navigator.pushReplacementNamed(context, LandingPage.id);
                     },
                   ),
                 ],
